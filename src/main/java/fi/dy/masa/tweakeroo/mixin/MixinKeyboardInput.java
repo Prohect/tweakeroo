@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import org.objectweb.asm.Opcodes;
 
 import org.spongepowered.asm.mixin.Final;
@@ -32,6 +33,8 @@ public abstract class MixinKeyboardInput extends Input
             opcode = Opcodes.PUTFIELD))
     private void customMovement(CallbackInfo ci)
     {
+        //as the jumpKey is hold by an object, it does not have a static accessor, so simply just use access widener would not handle the problem, so we create a static accessor for it
+        Tweakeroo.jumpKey = this.settings.jumpKey;
         if (FeatureToggle.TWEAK_MOVEMENT_KEYS.getBooleanValue())
         {
             InputHandler.getInstance().handleMovementKeys(this);

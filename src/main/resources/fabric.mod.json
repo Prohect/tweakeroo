@@ -19,6 +19,7 @@
 	"license": "LGPLv3",
 	"icon": "assets/tweakeroo/icon.png",
 	"environment": "client",
+	"accessWidener" : "tweakeroo.accesswidener",
 	"entrypoints": {
 		"main": [
 			"fi.dy.masa.tweakeroo.Tweakeroo"

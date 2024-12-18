@@ -22,6 +22,10 @@ repositories {
 	flatDir { dirs 'libs' }
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/tweakeroo.accesswidener")
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.mappings_version}:v2"

@@ -1,5 +1,6 @@
 package fi.dy.masa.tweakeroo.mixin;
 
+import fi.dy.masa.tweakeroo.Tweakeroo;
 import net.minecraft.entity.data.TrackedData;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +41,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Unique private final DummyMovementInput dummyMovementInput = new DummyMovementInput(null);
     @Unique private Input realInput;
     @Unique private float realNauseaIntensity;
-    @Unique private ItemStack autoSwitchElytraChestplate = ItemStack.EMPTY;
 
     private MixinClientPlayerEntity(ClientWorld world, GameProfile profile)
     {
@@ -127,24 +127,25 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;isGliding()Z"))
     private void onFallFlyingCheckChestSlot(CallbackInfo ci)
     {
-        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() &&
-            this.input.playerInput.jump() && this.input.playerInput.forward())
-        {
-            // PlayerEntity#checkFallFlying
-            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
-            {
-                if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
-                    this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
-                {
-                    InventoryUtils.equipBestElytra(this);
-                }
-            }
-        }
-        else
-        {
-            // reset auto switch item if the feature is disabled.
-            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
-        }
+        Tweakeroo.player = (ClientPlayerEntity) (Object) this;
+//        if (FeatureToggle.TWEAK_AUTO_SWITCH_ELYTRA.getBooleanValue() &&
+//            this.input.playerInput.jump() && this.input.playerInput.forward())
+//        {
+//            // PlayerEntity#checkFallFlying
+//            if (!this.isOnGround() && !this.isGliding() && !this.isInFluid() && !this.isClimbing() && !this.hasStatusEffect(StatusEffects.LEVITATION))
+//            {
+//                if (!this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA) ||
+//                    this.getEquippedStack(EquipmentSlot.CHEST).getDamage() > this.getEquippedStack(EquipmentSlot.CHEST).getMaxDamage() - 10)
+//                {
+//                    InventoryUtils.equipBestElytra(this);
+//                }
+//            }
+//        }
+//        else
+//        {
+//            // reset auto switch item if the feature is disabled.
+//            this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+//        }
     }
 
     @Inject(method = "onTrackedDataSet", at = @At("RETURN"))
@@ -156,16 +157,16 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             {
                 if (!this.isGliding() && this.getEquippedStack(EquipmentSlot.CHEST).isOf(Items.ELYTRA))
                 {
-                    if (!this.autoSwitchElytraChestplate.isEmpty() && !this.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
+                    if (!Tweakeroo.autoSwitchElytraChestplate.isEmpty() && !Tweakeroo.autoSwitchElytraChestplate.isOf(Items.ELYTRA))
                     {
                         if (this.playerScreenHandler.getCursorStack().isEmpty())
                         {
-                            int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, this.autoSwitchElytraChestplate, true, false);
+                            int targetSlot = InventoryUtils.findSlotWithItem(this.playerScreenHandler, Tweakeroo.autoSwitchElytraChestplate, true, false);
 
                             if (targetSlot >= 0)
                             {
                                 InventoryUtils.swapItemToEquipmentSlot(this, EquipmentSlot.CHEST, targetSlot);
-                                this.autoSwitchElytraChestplate = ItemStack.EMPTY;
+                                Tweakeroo.autoSwitchElytraChestplate = ItemStack.EMPTY;
                             }
                         }
                     }
